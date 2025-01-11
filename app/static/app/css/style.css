@@ -1,0 +1,116 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.chat-container {
+    width: 100%;
+    max-width: 600px;
+    height: 80%;
+    background-color: #ffffff;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.chat-box {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;  /* Messages flow from top to bottom */
+    justify-content: flex-start;
+    gap: 12px;  /* Gap between messages */
+}
+
+/* Message container to separate user and system messages */
+.chat-message {
+    display: flex;
+    flex-direction: column;  /* Stack message text and timestamp vertically */
+    margin-bottom: 12px;
+    align-items: flex-start;  /* Align messages to the left by default */
+}
+
+/* Message Text */
+.chat-message .message-text {
+    padding: 10px 15px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    display: inline-block;  /* Prevents stretching the message box */
+    max-width: 80%; /* Ensure message box is limited to 80% of the container width */
+    box-sizing: border-box;
+}
+
+/* System Message */
+.system-message {
+    justify-content: flex-start; /* Align system message to the left */
+}
+
+.system-message .message-text {
+    background-color: #E8F7FF;
+    color: #333;
+}
+
+/* User Message */
+.user-message {
+    justify-content: flex-end; /* Align user message to the right */
+    align-items: flex-end;  /* Align user message box to the right */
+}
+
+.user-message .message-text {
+    background-color: #D1F7C4;
+    color: #333;
+}
+
+/* Timestamp */
+.timestamp {
+    font-size: 12px;
+    color: #999;
+    margin-top: 4px;
+    text-align: right;  /* Align timestamp to the right of the message box */
+    align-self: flex-end;  /* Align timestamp to the right side (for user messages) */
+}
+
+/* Input Area */
+.input-container {
+    display: flex;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #ddd;
+}
+
+textarea {
+    width: 80%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    resize: none;
+}
+
+button {
+    width: 15%;
+    padding: 10px;
+    margin-left: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #45a049;
+}

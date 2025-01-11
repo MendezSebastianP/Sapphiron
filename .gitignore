@@ -1,0 +1,26 @@
+# Python Bytecode files
+__pycache__/
+*.py[cod]
+
+# Virtual Environment
+venv/
+
+# Django migrations
+*/migrations/
+
+# Django secret key
+*.env
+
+# IDEs
+.vscode/
+
+# macOS system files
+.DS_Store
+
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log

@@ -18,6 +18,7 @@
         <div class="input-container">
             <textarea id="user-input" placeholder="Escribe tu mensaje..." rows="2"></textarea>
             <button id="send-message">Enviar</button>
+            {% csrf_token %} 
         </div>
     </div>
 

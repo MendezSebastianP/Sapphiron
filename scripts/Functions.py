@@ -309,3 +309,4 @@ def next_scores(
         else:
             new_scores[key] = wrong_answer(value["score"], key, len(scores))
     return new_scores
+    

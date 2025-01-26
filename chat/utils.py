@@ -65,7 +65,7 @@ def next_random_verb(df: pd.DataFrame) -> str:
 
 
 def get_csv_response(user_message):
-    csv_path = os.path.join(settings.BASE_DIR, 'app', 'data', '1000verbs.csv')
+    csv_path = os.path.join(settings.BASE_DIR, 'chat', 'data', '1000verbs.csv')
     response = None
 
     df = pd.read_csv(csv_path)

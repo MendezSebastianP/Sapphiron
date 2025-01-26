@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'users/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="form-card">
+            <div class="profile-section">
+                <!-- Profile Image -->
+                <label class="profile-image-label" for="profile-image">
+                    <img src="{% static 'users/images/default-profile.jpg' %}" alt="Profile Picture" id="profile-image">
+                    <input type="file" id="profile-image" class="hidden" />
+                </label>
+                
+                <!-- Profile Name (text by default, editable on button click) -->
+                <div class="profile-name-container">
+                    <span id="profile-name-text">{{ user.email }}</span>
+                    <input type="text" id="profile-name-input" value="{{ user.email }}" style="display: none;">
+                </div>
+            </div>
+            
+            <!-- Game Links -->
+            <div class="game-links">
+                <div class="game-box">
+                    <h2><a href="/chat/">Practiquemos algunos verbos!</a></h2>
+                </div>
+                <div class="game-box placeholder">
+                    <h2>Juego sin definir. PLACEHOLDER</h2>
+                </div>
+                <div class="game-box placeholder">
+                    <h2>Juego sin definir. PLACEHOLDER</h2>
+                </div>
+                <div class="game-box placeholder">
+                    <h2>Juego sin definir. PLACEHOLDER</h2>
+                </div>
+                <div class="game-box placeholder">
+                    <h2>Juego sin definir. PLACEHOLDER</h2>
+                </div>
+                <div class="game-box placeholder">
+                    <h2>Juego sin definir. PLACEHOLDER</h2>
+                </div>
+                <div class="game-box placeholder">
+                    <h2>Juego sin definir. PLACEHOLDER</h2>
+                </div>
+            </div>
+            <!-- Logout Button -->
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Log Out</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

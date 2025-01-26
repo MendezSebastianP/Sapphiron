@@ -16,7 +16,7 @@ document.getElementById('send-message').addEventListener('click', function() {
         chatBox.scrollTop = chatBox.scrollHeight;
 
         // Send user message to server
-        fetch('/chat/', {
+        fetch('/chat/response/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

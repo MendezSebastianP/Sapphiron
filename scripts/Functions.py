@@ -4,19 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
+INITIAL_VALUES = {'score': 1000, 'streak': 0, 'right_count': 0, 'wrong_count': 0}
+INITIAL_N_VERBS = 10
 
-# Initial scores for verbs
-def generate_scores(
-    n_verbs: int = 10, initial_score: int = 1000
-) -> Dict[int, Dict[str, Union[float, int]]]:
-    scores = {
-        i: {"score": initial_score, "streak": 0, "right_count": 0, "wrong_count": 0}
-        for i in range(1, n_verbs + 1)
-    }
-    return scores
-
-
-scores = generate_scores()
+base_scores = {id:INITIAL_VALUES.copy() for id in range(1, INITIAL_N_VERBS + 1)}
 
 
 def score_to_prob(scores: Dict[int, Dict[str, Union[float, int]]]) -> Dict[int, float]:
@@ -29,14 +20,9 @@ def score_to_prob(scores: Dict[int, Dict[str, Union[float, int]]]) -> Dict[int, 
     Returns:
         Dict: A dictionary with probabilities as values.
     """
-
-    total_score = sum(item["score"] for item in scores.values())
-    if total_score == 0:
-        return {key: 0.0 for key in scores}
-    return {key: value["score"] / total_score for key, value in scores.items()}
-
-
-# score_to_prob(scores)
+    
+    total_score = sum(item['score'] for item in scores.values())
+    return {key: value['score'] / total_score for key, value in scores.items()}
 
 
 def next_verb(scores: Dict[int, Dict[str, Union[float, int]]]) -> np.int64:
@@ -53,12 +39,8 @@ def next_verb(scores: Dict[int, Dict[str, Union[float, int]]]) -> np.int64:
     return np.random.choice(list(prob.keys()), p=list(prob.values()))
 
 
-next_verb(scores)
 
-
-def simulation_plot_verb(
-    scores: Dict[int, Dict[str, Union[float, int]]], n: int
-) -> None:
+def simulation_plot_verb(scores: Dict[int, Dict[str, Union[float, int]]], n: int) -> None:
     """
     Simulates verb selection and plots the results.
 
@@ -84,14 +66,14 @@ def simulation_plot_verb(
     plt.bar(
         count_selections.keys(),
         count_selections.values(),
-        edgecolor="black",
-        color="skyblue",
-        alpha=0.7,
+        edgecolor='black',
+        color='skyblue',
+        alpha=0.7
     )
     plt.title("Simulation Results")
     plt.xlabel("Verb Key")
     plt.ylabel("Selection Count")
-    plt.grid(axis="y", linestyle="--", alpha=0.7)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
 
     # Plot real probabilities
     probabilities = score_to_prob(scores)
@@ -99,14 +81,14 @@ def simulation_plot_verb(
     plt.bar(
         probabilities.keys(),
         probabilities.values(),
-        edgecolor="black",
-        color="orange",
-        alpha=0.7,
+        edgecolor='black',
+        color='orange',
+        alpha=0.7
     )
     plt.title("Real Probabilities")
     plt.xlabel("Verb Key")
     plt.ylabel("Probability")
-    plt.grid(axis="y", linestyle="--", alpha=0.7)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
 
     plt.tight_layout()
     plt.show()
@@ -143,7 +125,7 @@ def right_answer(score: float, streak: int) -> float:
     Returns:
         float: The adjusted score.
     """
-    return score * (0.7**streak)
+    return score * (0.7 ** streak)
 
 
 def wrong_answer(score: float, rank: int, n: int = 1000) -> float:
@@ -162,19 +144,35 @@ def wrong_answer(score: float, rank: int, n: int = 1000) -> float:
     return score * a1
 
 
+def next_level_check(scores: Dict[int, Dict[str, Union[float, int]]], level_treshhold: float = 0.6) -> bool:
+    next_level_counter = sum(1 for value in scores.values() if value['score'] <= 700)
+    if next_level_counter / len(scores.keys()) >= level_treshhold:
+        return True
+    else: 
+        return False
+        
+
+def update_verbs(scores: Dict[int, Dict[str, Union[float, int]]], verb_unlock: int = 3) -> Dict[int, Dict[str, Union[float, int]]]:
+    if next_level_check(scores):
+        last_verb = max(scores.keys())
+        for _ in range(verb_unlock):
+            last_verb += 1
+            scores[last_verb] = INITIAL_VALUES.copy()
+    return None
+
+
 def test_session(
-    scores: Dict[int, Dict[str, Union[float, int]]],
+    base_scores: Dict[int, Dict[str, Union[float, int]]],
     plot: bool = False,
     tries: int = 10,
     accuracy: float = 1,
-    verb_unlock: int = 3,
 ) -> Dict[int, Dict[str, Union[float, int]]]:
     """
     Simulates a test session with adjustable parameters.
 
     Args:
         scores (Dict): A dictionary of scores.
-        n_verbs (int): Number of verbs in the session.
+        plot (bool): verb scores bar plot
         tries (int): Number of tries in the session.
         accuracy (float): The user's accuracy rate.
         verb_unlock (int): Number of new verbs unlocked after a session.
@@ -182,58 +180,35 @@ def test_session(
     Returns:
         Dict: Updated dictionary of scores.
     """
-    results = copy.deepcopy(scores)
-    next_level_counter = 0
-    n_verbs = len(results.keys())
-
+    scores = copy.deepcopy(base_scores)
     for _ in range(tries):
-        verb = next_verb(results)
-
-        if random.random() <= accuracy:
-            results[verb]["streak"] += 1
-            results[verb]["score"] = right_answer(
-                results[verb]["score"], results[verb]["streak"]
-            )
-            results[verb]["right_count"] += 1
-            next_level_counter = sum(
-                1 for value in results.values() if value["score"] <= 700
-            )
-            max_verb = max(results.keys())
-            if next_level_counter / n_verbs >= 0.6:
-                for i in range(1, verb_unlock + 1):
-                    results[max_verb + i] = {
-                        "score": 1000,
-                        "streak": 0,
-                        "right_count": 0,
-                        "wrong_count": 0,
-                    }
-                n_verbs += verb_unlock
+        verb = next_verb(scores)
+        if random.random() < accuracy:
+            scores[verb]['streak'] += 1
+            scores[verb]['right_count'] += 1
+            scores[verb]['score'] = right_answer(scores[verb]['score'], scores[verb]['streak'])
+            update_verbs(scores)
         else:
-            results[verb]["streak"] = 0
-            results[verb]["score"] = wrong_answer(results[verb]["score"], verb)
-            results[verb]["wrong_count"] += 1
+            scores[verb]['streak'] = 0
+            scores[verb]['wrong_count'] += 1
+            scores[verb]['score'] = wrong_answer(scores[verb]['score'], rank=verb)
+
     if plot is True:
-        scores_iter = [values["score"] for values in results.values()]
-        plt.bar(results.keys(), scores_iter)
-        plt.xticks(ticks=range(1, n_verbs))
-        plt.title("Verb scores - Histogram")
-        plt.xlabel("Verb Range")
-        plt.ylabel("Score")
+        results_iter = [values['score']for values in scores.values()]
+        plt.bar(scores.keys(), results_iter)
+        plt.xticks(ticks=range(1,len(scores.keys())))
+        plt.title('Verb results - Histogram')
+        plt.xlabel('Verb Range')
+        plt.ylabel('Score')
         plt.show()
 
-    return results
-
-
-print(test_session(scores, plot=True))
+    return scores
 
 
 def test_session_simulation(
     n: int,
-    scores: Dict[int, Dict[str, Union[float, int]]],
-    n_verbs: int = 10,
-    tries: int = 10,
-    accuracy: float = 1,
-    verb_unlock: int = 3,
+    base_scores: Dict[int, Dict[str, Union[float, int]]],
+    plot: bool = True
 ) -> None:
     """
     Simulates multiple user sessions and provides statistical summaries and visualizations.
@@ -241,56 +216,36 @@ def test_session_simulation(
     Args:
         n (int): Number of simulations.
         scores (Dict): A dictionary of scores.
-        n_verbs (int): Number of verbs in the session.
-        tries (int): Number of tries in the session.
-        accuracy (float): The user's accuracy rate.
-        verb_unlock (int): Number of new verbs unlocked after a session.
+        plot: (str): score_hist
 
     Returns:
         None
     """
     # Run simulations
-    simulations = []
-    for _ in range(n):
-        simulation_result = test_session(
-            copy.deepcopy(scores),
-            n_verbs=n_verbs,
-            tries=tries,
-            accuracy=accuracy,
-            verb_unlock=verb_unlock,
-        )
-        simulations.append(simulation_result)
+    simulations = [test_session(base_scores) for _ in range(n)]
 
-    # Collect distributions
-    scores_by_iteration = []
-
+    scores_hist = {}
+    scores_by_iter = []
     for simulation in simulations:
-        iteration_scores = [verb["score"] for verb in simulation.values()]
-        scores_by_iteration.append(iteration_scores)
+        for id, value in simulation.items():
+            if value['score'] in list(scores_hist.keys()):
+                scores_hist[value['score']] += 1
+            else:
+                scores_hist[value['score']] = 1
+    
 
-    # First Graph: Boxplots for each iteration
-    plt.figure(figsize=(12, 6))
-    plt.boxplot(
-        scores_by_iteration,
-        patch_artist=True,
-        boxprops=dict(facecolor="skyblue", alpha=0.7),
-        medianprops=dict(color="red"),
-        showmeans=True,
-        meanprops=dict(marker="o", markerfacecolor="green", markeredgecolor="black"),
-    )
-    plt.title("Score Distribution Across Iterations")
-    plt.xlabel("Iteration")
-    plt.ylabel("Scores")
-    plt.grid(axis="y", linestyle="--", alpha=0.7)
-    plt.tight_layout()
-    plt.show()
+    if plot:
+        plt.pie(x= list(scores_hist.values()), labels=list(scores_hist.keys()), autopct='%1.1f%%')
+        plt.show()
 
     return simulations
+
+test_session_simulation(100, base_scores)
 
 
 def next_scores(
     results: Dict[int, Dict[str, Union[float, int]]],
-    scores: Dict[int, Dict[str, Union[float, int]]],
+    scores: Dict[int, Dict[str, Union[float, int]]]
 ) -> Dict[int, float]:
     """
     Calculates new scores based on the results.
@@ -304,9 +259,8 @@ def next_scores(
     """
     new_scores = {}
     for key, value in scores.items():
-        if results[key]["streak"] > 0:
-            new_scores[key] = right_answer(value["score"], value["streak"])
+        if results[key]['streak'] > 0:
+            new_scores[key] = right_answer(value['score'], value['streak'])
         else:
-            new_scores[key] = wrong_answer(value["score"], key, len(scores))
+            new_scores[key] = wrong_answer(value['score'], key, len(scores))
     return new_scores
-    

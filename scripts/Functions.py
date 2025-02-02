@@ -115,34 +115,19 @@ def verbs_session(scores: Dict[int, Dict[str, Union[float, int]]], n: int) -> li
     return selected_verbs
 
 
-def right_answer(score: float, streak: int) -> float:
-    """
-    Adjusts the score for a correct answer, considering the current streak.
-
-    Args:
-        score (float): The current score.
-        streak (int): The current streak count.
-
-    Returns:
-        float: The adjusted score.
-    """
-    return score * (0.7 ** streak)
+def right_answer(scores, index):
+    scores[index]['score'] = scores[index]['score'] * (0.7 ** scores[index]['streak'])
+    scores[index]['streak'] += 1
+    if (scores[index]['score'] < 1):
+        scores[index]['score'] = 1
 
 
-def wrong_answer(score: float, rank: int, n: int = 1000) -> float:
-    """
-    Adjusts the score for an incorrect answer, considering rank.
-
-    Args:
-        score (float): The current score.
-        rank (int): The rank of the verb.
-        n (int): Total number of verbs (default is 1000).
-
-    Returns:
-        float: The adjusted score.
-    """
-    a1 = 1.2 + ((n - rank + 1) / (n - 1))
-    return score * a1
+def wrong_answer(scores, index):
+    mult = 1.2 + ((N_VERBS - index + 1) / (N_VERBS - 1))
+    scores[index]['score'] *= mult
+    scores[index]['streak'] = 1
+    if (scores[index]['score'] > 10**5):
+        scores[index]['score'] = 10**5
 
 
 def next_level_check(scores: Dict[int, Dict[str, Union[float, int]]], level_treshhold: float = 0.6) -> bool:

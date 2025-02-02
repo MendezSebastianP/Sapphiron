@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
+N_VERBS = 1000
 INITIAL_VALUES = {'score': 1000, 'streak': 0, 'right_count': 0, 'wrong_count': 0}
 INITIAL_N_VERBS = 10
 
